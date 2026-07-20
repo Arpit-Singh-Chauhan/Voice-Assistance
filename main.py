@@ -17,11 +17,11 @@ def speak(text):
 websites = {
     "google": "https://google.com",
     "youtube": "https://youtube.com",
-    "github": "https://github.com",
     "wikipedia": "https://wikipedia.org",
-    "instagram":  "https://instagram.com",
-    "linkedin":  "https://linkedin.com",
     "chat gpt":  "https://chatgpt.com",
+    "github": "https://github.com/Arpit-Singh-Chauhan",
+    "instagram":  "https://www.instagram.com/arpit_singhchauhan1/",
+    "linkedin":  "https://www.linkedin.com/in/arpit-singh-chauhan1209/",
 }
 
 def processCommand(c):
@@ -46,10 +46,10 @@ if __name__ == "__main__":
             with sr.Microphone() as source:
                 print("Listening...")
                 r.adjust_for_ambient_noise(source)
-                audio = r.listen(source, timeout=2, phrase_time_limit=1)
+                audio = r.listen(source, timeout=1, phrase_time_limit=2)
             word = r.recognize_google(audio)
             # if "hello" in word.lower():
-            if any(x in word.lower() for x in ["ok", "okay", "ook"]):
+            if any(x in word.lower() for x in ["open", "pen", "ope"]):
                 print("Wake word detected")
                 speak("Yes")
                 with sr.Microphone() as source:
