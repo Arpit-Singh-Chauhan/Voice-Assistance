@@ -1,6 +1,6 @@
 # 🤖 Jarvis - Python Voice Assistant
 
-A simple voice-controlled virtual assistant built with Python that can recognize voice commands, respond using text-to-speech, open websites, and play music from a predefined playlist.
+A simple voice-controlled virtual assistant built with Python that can recognize voice commands, respond using text-to-speech, open websites, play music from a predefined playlist, open spotify and perform websearch on google.
 
 ---
 
