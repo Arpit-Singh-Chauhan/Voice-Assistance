@@ -89,17 +89,33 @@ def processCommand(c):
         if arg in websites:
             speak(f"opening {arg}")
             webbrowser.open(websites[arg])
-
+            return True
+        
         else:
             speak("Sorry, I don't know that website.")
+            return False
 
     elif action == "play":
 
         if arg in music_lib.music:
             speak(f"playing {arg}")
             webbrowser.open(music_lib.music[arg])
+            return True
+
+        elif any(word in arg for word in ["random", "song"]):
+            speak("playing a random song for you")
+            key = random.choice(list(music_lib.music))
+            webbrowser.open(music_lib.music[key])
+            return True
+
+        elif "spotify" in arg:
+            speak("opening spotify")
+            webbrowser.open("https://open.spotify.com/playlist/78NDTpix9jThoMxdZ5eunP")
+            return True
+
         else:
             speak("Sorry, I don't have that song.")
+            return False
 
 
     elif action == "search":
@@ -107,11 +123,15 @@ def processCommand(c):
         if arg:
             speak(f"searching {arg}")
             webbrowser.open(f"https://www.google.com/search?q={quote_plus(arg)}")
+            return True
+
         else:
             speak("What would you like me to search for?")
+            return False
 
     else:
         speak("Sorry, I don't know that command.")
+        return False
 
 
 #listening
@@ -129,14 +149,14 @@ def listen(timeout=2, phrase_time_limit=4):
             return r.recognize_google(audio, language="en-IN")
 
     except sr.UnknownValueError:
-        return None
+        return "UNKNOWN"
 
     except sr.RequestError:
         print("Speech recognition service is unavailable.")
         return None
 
     except sr.WaitTimeoutError:
-        return None
+        return "TIMEOUT"
 
     except Exception as e:
                 print("Error:", e)
@@ -176,7 +196,8 @@ if __name__ == "__main__":
         print("Listening for wake word...")
 
         word = listen(timeout=None, phrase_time_limit=2)
-        if word is None:
+
+        if word in ["UNKNOWN", "TIMEOUT", None]:
             continue
 
         print("Heard:", word)
@@ -187,18 +208,39 @@ if __name__ == "__main__":
 
             speak(random.choice(RESPONSES))
 
-            print("Listening for command...")
+            max_try = 3
+            retries = 0
 
-            command = listen(timeout=5, phrase_time_limit=6)
+            while True:
 
-            if command is None:
-                speak("I didn't catch that")
-                continue
-            
-            print("Command:", command)
+                print("Listening for command...")
 
-            if exit_command(command):
-                speak("Goodbye Sir.")
-                break
+                command = listen(timeout=5, phrase_time_limit=6)
 
-            processCommand(command)
+                if command == "TIMEOUT":
+                    speak("No command received.")
+                    break
+
+                elif command == "UNKNOWN":
+                    retries += 1
+
+                    if retries == max_try:
+                        speak("No command received, Going back to wake word")
+                        break
+
+                    speak("I didn't catch that, Please repeat the command")
+                    continue
+
+                if exit_command(command):
+                    speak("Goodbye Sir.")
+                    exit()          # full prog. close
+
+
+                print("Command:", command)
+                # processCommand(command)
+
+                success = processCommand(command)
+                if success:
+                    break
+
+                speak("Please say another command.")
